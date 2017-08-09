@@ -32,10 +32,10 @@ version: '2.1'
 services:
 
     nginx:
-        image: vkucukcakar/nginx:1.0.0-alpine
+        image: vkucukcakar/nginx:1.0.1-alpine
         
     php-fpm:
-        image: vkucukcakar/php-fpm:1.0.2-alpine
+        image: vkucukcakar/php-fpm:1.0.3-alpine
         
     rsyslog:
         image: vkucukcakar/rsyslog:1.0.3-alpine
