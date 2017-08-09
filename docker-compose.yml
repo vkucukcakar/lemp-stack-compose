@@ -1,0 +1,307 @@
+###
+# lemp-stack-compose
+# LEMP Stack with Docker Compose
+# Copyright (c) 2017 Volkan Kucukcakar
+#
+# This file is part of lemp-stack-compose.
+#
+# lemp-stack-compose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# lemp-stack-compose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# This copyright notice and license must be retained in all files and derivative works.
+###
+
+
+###
+# File Name        : docker-compose.yml
+# File Description : Main Compose file
+###
+
+version: '2.1'
+
+services:
+
+
+    ### Server related common containers ###
+
+
+    # Container: server-log. Common rsyslog and and its own logrotate service.
+    server-log:
+        extends:
+            file: common-services.yml
+            service: rsyslog
+        container_name: server-log
+        healthcheck:
+            interval: 5s
+            timeout: 5s
+            retries: 2
+        expose:
+            - "5514"
+            - "5514/udp"
+        environment:
+            AUTO_CONFIGURE: enable
+            CONTAINER_NAME: server-log
+            COMMON_TAG: server-common
+            CONTAINER_TAGS: "server-proxy example-com-web"
+        volumes:
+            - ./log:/var/log
+            - ./configurations/server-log:/configurations
+        # Currently, host network_mode is used as container hostname is not reachable at this level.
+        # So, 'syslog-address: "tcp://localhost:5514"' is used instead of 'syslog-address: "tcp://server-log:514"'
+        # To prevent conflict in the host computer, also the default port 514 is changed as 5514.
+        # Another workaround would be using static ip here.
+        # Maybe this will be fixed in the future.
+        network_mode: "host"
+
+    # Container: server-cron. Common custom cron.
+    server-cron:
+        extends:
+            file: common-services.yml
+            service: cron
+        container_name: server-cron
+        depends_on:
+            server-log:
+                condition: service_healthy
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "server-cron"
+        #environment:
+            #AUTO_CONFIGURE: enable
+            # EXECUTABLES should contain space separated filenames to give execute permission
+            #EXECUTABLES: ""
+        volumes:
+            # Put your custom executable files here without extension (Debian ignores executables with extensions in cron.* directories)
+            - ./configurations/server-cron/cron.hourly:/etc/cron.hourly
+            - ./configurations/server-cron/cron.daily:/etc/cron.daily
+            - ./configurations/server-cron/cron.weekly:/etc/cron.weekly
+            - ./configurations/server-cron/cron.monthly:/etc/cron.monthly
+            # Put your custom cron files here for arbitrary scheduling
+            - ./configurations/server-cron/cron.d:/etc/cron.d
+            # Mount docker.sock if you need some magic
+            #- /var/run/docker.sock:/var/run/docker.sock
+
+    # Container: server-gui. Common Portainer gui.
+    server-gui:
+        extends:
+            file: common-services.yml
+            service: portainer
+        container_name: server-gui
+        depends_on:
+            server-log:
+                condition: service_healthy
+        command: -l hide-me=from-portainer
+        labels:
+            hide-me: "from-portainer"
+        ports:
+            - "9000:9000"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "server-gui"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - portainer_data:/data
+
+    # Container: server-db. Common MySql database.
+    server-db:
+        extends:
+            file: common-services.yml
+            service: mysql
+        container_name: server-db
+        depends_on:
+            server-log:
+                condition: service_healthy
+        expose:
+            - "3306"
+        ports:
+            # This is just to reach from host. Containers should already reach by using same network.
+            - "127.0.0.1:3306:3306"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "server-db"
+        volumes:
+            - db_data:/var/lib/mysql
+            - ./configurations/server-db/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+        environment:
+            # Change the default mysql root password from here! (Also change docker-compose.prod.yml file if you include it)
+            MYSQL_ROOT_PASSWORD: toor
+        networks:
+            server-db:
+            # Note that example-com network must be listed also here to grant access to mysql
+            example-com:
+
+    # Container: server-phpmyadmin. Common Phpmyadmin.
+    server-phpmyadmin:
+        extends:
+            file: common-services.yml
+            service: phpmyadmin
+        container_name: server-phpmyadmin
+        depends_on:
+            - server-db
+        ports:
+            - "9090:80"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "server-phpmyadmin"
+        environment:
+            # Write mysql root password here (Also change docker-compose.prod.yml file if you include it)
+            MYSQL_ROOT_PASSWORD: toor
+            PMA_HOST: server-db
+        networks:
+            server-db:
+
+    # Container: server-proxy. Common reverse proxy.
+    server-proxy:
+        extends:
+            file: common-services.yml
+            service: nginx
+        container_name: server-proxy
+        depends_on:
+            - example-com-web
+        ports:
+            - "80:80"
+            - "443:443"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "server-proxy"
+        environment:
+            AUTO_CONFIGURE: enable
+            CONTAINER_NAME: server-proxy
+            SERVER_ROLE: proxy
+            VHOSTS: "example.com"
+            CONTAINER_NAME_example.com: example-com-web
+            CERT_CREATE_default_server: enable
+            CERT_CREATE_example.com: enable
+            #DHPARAM_CREATE: enable
+            #DHPARAM_KEYSIZE: 1024
+        volumes:
+            - ./configurations/server-proxy:/configurations
+        networks:
+            # Note that example-com network must be listed also here to be accessible
+            example-com:
+            #test-tld:
+
+    # Container: server-mta. Common mail transfer agent.
+    #server-mta:
+    #TODO
+
+
+
+    ### Website: example.com ###
+
+    # Modify this section according to your needs. Replace example-com with your domain name. Do not forget to modify other configuration files.
+
+
+    # Container: example-com-web. Upstream server using official Nginx image.
+    example-com-web:
+        extends:
+            file: common-services.yml
+            service: nginx
+        container_name: example-com-web
+        depends_on:
+            - example-com-php
+        expose:
+            - "80"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "example-com-web"
+        environment:
+            AUTO_CONFIGURE: enable
+            CONTAINER_NAME: example-com-web
+            SERVER_ROLE: upstream
+            DOMAIN_NAME: "example.com"
+            PHP_CONTAINER_NAME: example-com-php
+        volumes:
+            - ./html/example.com:/var/www/html
+            - ./configurations/example-com:/configurations
+        networks:
+            example-com:
+
+    # Container: example-com-php. Upstream server's php using official PHP based image.
+    example-com-php:
+        extends:
+           file: common-services.yml
+           service: php-fpm
+        container_name: example-com-php
+        depends_on:
+            - server-db
+        expose:
+            - "9000"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "example-com-php"
+        environment:
+            AUTO_CONFIGURE: enable
+            CONTAINER_NAME: example-com-php
+            DOMAIN_NAME: "example.com"
+            SSMTP_MAILHUB: server-mta
+            # Change owner of /var/www/html and some special directories (/data/opcache, /sessions, /home/www-data) recursively to "www-data:www-data".
+            # As the default user is www-data and it is already used in PHP-FPM configuration files, this will solve PHP permission errors for development.
+            # This also affects the directories and files at host if you mount volumes. Will also be enabled if CHANGE_UID or CHANGE_GID is set.
+            CHANGE_OWNER: enable
+            # Change uid of default user www-data. You can make this match your current uid (id -u) on host to easily access mounted volumes for development.
+            CHANGE_UID: 1000
+            # Change gid of default group www-data. You can make this match your current gid (id -g) on host for development.
+            CHANGE_GID: 1000
+        volumes:
+            - ./html/example.com:/var/www/html
+            - ./configurations/example-com:/configurations
+        networks:
+            example-com:
+
+
+
+# Named volumes
+volumes:
+    db_data:
+    portainer_data:
+
+# Networks
+networks:
+    default:
+        driver: bridge
+        driver_opts:
+            com.docker.network.bridge.name: br-default
+    server-db:
+        driver: bridge
+        driver_opts:
+            com.docker.network.bridge.name: br-server-db
+    # Note that example-com network must be defined in networks section
+    example-com:
+        driver: bridge
+        driver_opts:
+            com.docker.network.bridge.name: br-example-com
+    #test-tld:
+        #driver: bridge
+        #driver_opts:
+            #com.docker.network.bridge.name: br-test-tld
+
+
+
+
+
+
+

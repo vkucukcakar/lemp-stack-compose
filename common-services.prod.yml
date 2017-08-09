@@ -1,0 +1,56 @@
+###
+# lemp-stack-compose
+# LEMP Stack with Docker Compose
+# Copyright (c) 2017 Volkan Kucukcakar
+#
+# This file is part of lemp-stack-compose.
+#
+# lemp-stack-compose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# lemp-stack-compose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# This copyright notice and license must be retained in all files and derivative works.
+###
+
+
+###
+# File Name        : common-services.prod.yml
+# File Description : Common services versioning production example. More distinctive versions should be given in this file.
+###
+
+version: '2.1'
+
+services:
+
+    nginx:
+        image: vkucukcakar/nginx:1.0.0-alpine
+        
+    php-fpm:
+        image: vkucukcakar/php-fpm:1.0.2-alpine
+        
+    rsyslog:
+        image: vkucukcakar/rsyslog:1.0.3-alpine
+        
+    cron:
+        image: vkucukcakar/cron:1.0.3-alpine
+        
+    #postfix:
+        #image: vkucukcakar/postfix:1.0.0-alpine
+        
+    mysql:
+        image: mysql:5.7.19
+        
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:4.7.3-1
+        
+    portainer:
+        image: portainer/portainer:1.13.6

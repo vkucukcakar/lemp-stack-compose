@@ -1,0 +1,102 @@
+###
+# lemp-stack-compose
+# LEMP Stack with Docker Compose
+# Copyright (c) 2017 Volkan Kucukcakar
+#
+# This file is part of lemp-stack-compose.
+#
+# lemp-stack-compose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# lemp-stack-compose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# This copyright notice and license must be retained in all files and derivative works.
+###
+
+
+###
+# File Name        : docker-compose.prod.yml
+# File Description : Main Compose file, production override example
+###
+
+version: '2.1'
+
+services:
+
+    ### Server related common containers ###
+
+    server-log:
+        restart: on-failure
+
+    server-cron:
+        restart: on-failure
+        
+    server-gui:
+        extends:
+            file: common-services.prod.yml
+            service: portainer
+        restart: on-failure
+        ports:
+            # Make portainer reachable only from host computer (or by tunneling etc...)
+            - "127.0.0.1:9000:9000"
+
+    server-db:
+        extends:
+            file: common-services.prod.yml
+            service: mysql
+        restart: on-failure
+        environment:
+            # Change the default mysql root password here!
+            MYSQL_ROOT_PASSWORD: toor
+
+    server-phpmyadmin:
+        extends:
+            file: common-services.prod.yml
+            service: phpmyadmin
+        restart: on-failure
+        ports:
+            # Make phpmyadmin reachable only from host computer (or by tunneling etc...)
+            - "127.0.0.1:9090:80"
+        environment:
+            # Write mysql root password here
+            MYSQL_ROOT_PASSWORD: toor
+
+    server-proxy:
+        extends:
+            file: common-services.prod.yml
+            service: nginx
+        restart: on-failure
+        environment:
+            AUTO_CONFIGURE: enable
+            CONTAINER_NAME: server-proxy
+            SERVER_ROLE: proxy
+            VHOSTS: "example.com"
+            CONTAINER_NAME_example.com: example-com-web
+            CERT_CREATE_example.com: enable
+            #DHPARAM_CREATE: enable
+            #DHPARAM_KEYSIZE: 2048
+
+    #server-mta:
+        #restart: on-failure
+
+    ### Website: example.com ###
+
+    #Modify this section according to your needs. Replace example-com with your domain name. Do not forget to modify configuration files in /volumes directories.
+
+    example-com-web:
+        extends:
+            file: common-services.prod.yml
+            service: nginx
+        restart: on-failure
+
+    example-com-php:
+        restart: on-failure
+
