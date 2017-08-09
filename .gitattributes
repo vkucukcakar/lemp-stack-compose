@@ -17,3 +17,4 @@
 *.RTF	 diff=astextplain
 
 *.yml linguist-language=YAML
+phpinfo.php linguist-vendored=false
