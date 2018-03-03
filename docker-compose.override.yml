@@ -35,8 +35,10 @@ services:
 
     server-gui:
         ports:
+            # Portainer reachable publicly (for development server)
             - "9000:9000"
 
     server-phpmyadmin:
         ports:
+            # Phpmyadmin reachable publicly (for development server)
             - "9090:80"

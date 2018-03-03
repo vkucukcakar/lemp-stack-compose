@@ -104,8 +104,6 @@ services:
         command: -l hide-me=from-portainer
         labels:
             hide-me: "from-portainer"
-        ports:
-            - "9000:9000"
         logging:
             driver: syslog
             options:
@@ -153,8 +151,6 @@ services:
         container_name: server-phpmyadmin
         depends_on:
             - server-db
-        ports:
-            - "9090:80"
         logging:
             driver: syslog
             options:
@@ -208,7 +204,7 @@ services:
 
     ### Website: example.com ###
 
-    # Modify this section according to your needs. Replace example-com with your domain name. Do not forget to modify other configuration files.
+    # Modify this section, change "example-com" and "example.com" according to your domain name.  Do not forget to modify other configuration files.
 
 
     # Container: example-com-web. Upstream server using official Nginx image.

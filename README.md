@@ -26,7 +26,7 @@ These compose files are not just a ready-to-use example of LEMP stack with Docke
 	$ docker-compose up -d
 
 ### Production example
-	$ docker-compose pull
+	$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
 	$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ## Caveats

@@ -34,11 +34,17 @@ services:
     ### Server related common containers ###
 
     server-log:
+        extends:
+            file: common-services.prod.yml
+            service: rsyslog
         restart: on-failure
 
     server-cron:
+        extends:
+            file: common-services.prod.yml
+            service: cron
         restart: on-failure
-        
+
     server-gui:
         extends:
             file: common-services.prod.yml
@@ -89,7 +95,7 @@ services:
 
     ### Website: example.com ###
 
-    #Modify this section according to your needs. Replace example-com with your domain name. Do not forget to modify configuration files in /volumes directories.
+    # Modify this section, change "example-com" and "example.com" according to your domain name.  Do not forget to modify other configuration files.
 
     example-com-web:
         extends:
@@ -98,5 +104,8 @@ services:
         restart: on-failure
 
     example-com-php:
+        extends:
+            file: common-services.prod.yml
+            service: php-fpm
         restart: on-failure
 
