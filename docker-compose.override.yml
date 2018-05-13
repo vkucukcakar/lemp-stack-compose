@@ -38,7 +38,12 @@ services:
             # Portainer reachable publicly (for development server)
             - "9000:9000"
 
-    server-phpmyadmin:
+    #server-phpmyadmin:
+    #    ports:
+    #        # Phpmyadmin reachable publicly (for development server)
+    #        - "9090:80"
+
+    server-adminer:
         ports:
-            # Phpmyadmin reachable publicly (for development server)
-            - "9090:80"
+            # Adminer reachable publicly (for development server)
+            - "9090:8080"

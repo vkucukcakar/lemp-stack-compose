@@ -63,17 +63,26 @@ services:
             # Change the default mysql root password here!
             MYSQL_ROOT_PASSWORD: toor
 
-    server-phpmyadmin:
+    #server-phpmyadmin:
+    #    extends:
+    #        file: common-services.prod.yml
+    #        service: phpmyadmin
+    #    restart: on-failure
+    #    ports:
+    #        # Make phpmyadmin reachable only from host computer (or by tunneling etc...)
+    #        - "127.0.0.1:9090:80"
+    #    environment:
+    #        # Write mysql root password here
+    #        MYSQL_ROOT_PASSWORD: toor
+
+    server-adminer:
         extends:
             file: common-services.prod.yml
-            service: phpmyadmin
+            service: adminer
         restart: on-failure
         ports:
-            # Make phpmyadmin reachable only from host computer (or by tunneling etc...)
-            - "127.0.0.1:9090:80"
-        environment:
-            # Write mysql root password here
-            MYSQL_ROOT_PASSWORD: toor
+            # Make adminer reachable only from host computer (or by tunneling etc...)
+            - "127.0.0.1:9090:8080"
 
     server-proxy:
         extends:

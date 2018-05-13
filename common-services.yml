@@ -34,24 +34,27 @@ services:
 
     nginx:
         image: vkucukcakar/nginx
-        
+
     php-fpm:
         image: vkucukcakar/php-fpm
-        
+
     rsyslog:
         image: vkucukcakar/rsyslog
-        
+
     cron:
         image: vkucukcakar/cron
-        
+
     #postfix:
-        #image: vkucukcakar/postfix
-        
+    #    image: vkucukcakar/postfix
+
     mysql:
         image: mysql:5.7
-        
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin:4.7
+
+    #phpmyadmin:
+    #    image: phpmyadmin/phpmyadmin:4.7
+
+    adminer:
+        image: adminer:4-standalone
 
     portainer:
         image: portainer/portainer

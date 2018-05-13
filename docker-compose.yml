@@ -144,22 +144,45 @@ services:
             example-com:
 
     # Container: server-phpmyadmin. Common Phpmyadmin.
-    server-phpmyadmin:
+    #server-phpmyadmin:
+    #    extends:
+    #        file: common-services.yml
+    #        service: phpmyadmin
+    #    container_name: server-phpmyadmin
+    #    depends_on:
+    #        - server-db
+    #    logging:
+    #        driver: syslog
+    #        options:
+    #            syslog-address: "tcp://localhost:5514"
+    #            tag: "server-phpmyadmin"
+    #    environment:
+    #        # Write mysql root password here (Also change docker-compose.prod.yml file if you include it)
+    #        MYSQL_ROOT_PASSWORD: toor
+    #        PMA_HOST: server-db
+    #    networks:
+    #        server-db:
+
+    # Container: server-adminer. Common adminer.
+    server-adminer:
         extends:
             file: common-services.yml
-            service: phpmyadmin
-        container_name: server-phpmyadmin
+            service: adminer
+        container_name: server-adminer
         depends_on:
             - server-db
         logging:
             driver: syslog
             options:
                 syslog-address: "tcp://localhost:5514"
-                tag: "server-phpmyadmin"
+                tag: "server-adminer"
         environment:
-            # Write mysql root password here (Also change docker-compose.prod.yml file if you include it)
-            MYSQL_ROOT_PASSWORD: toor
-            PMA_HOST: server-db
+            ADMINER_DEFAULT_SERVER: server-db
+            # Want to change design? See https://www.adminer.org/ for alternative designs
+            #ADMINER_DESIGN: pepa-linha
+        volumes:
+            # Override php.ini limits for SQL/file import
+            - ./configurations/server-adminer/adminer-custom-php.ini:/usr/local/etc/php/conf.d/adminer-custom-php.ini
         networks:
             server-db:
 
