@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.0.0
+
+- Changed Compose configuration file (yml) structure
+- Separated upstream yml files from main configuration file
+- Upgraded Compose file version. Sticked with 2.4 because of "extends" keyword and "service_healthy" condition in "depends_on"
+
+## v1.4.0
+
+- Removed cron which is not essential and should be in the host
+- Upgraded versions of some images
+
 ## v1.3.0
 
 - Switched from phpMyAdmin to Adminer

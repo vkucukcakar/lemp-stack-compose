@@ -1,0 +1,128 @@
+###
+# lemp-stack-compose
+# LEMP Stack with Docker Compose
+# Copyright (c) 2017 Volkan Kucukcakar
+#
+# This file is part of lemp-stack-compose.
+#
+# lemp-stack-compose is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# lemp-stack-compose is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# This copyright notice and license must be retained in all files and derivative works.
+###
+
+
+###
+# File Name        : example.com.yml
+# File Description : Compose file to override docker-compose.yml for example.com
+###
+
+version: '2.4'
+
+services:
+
+    # Container: example-com-web. Upstream server using official Nginx image.
+    example-com-web:
+        extends:
+            file: common-services.yml
+            service: nginx
+        restart: on-failure
+        container_name: example-com-web
+        depends_on:
+            - example-com-php
+        expose:
+            - "80"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "example-com-web"
+        environment:
+            AUTO_CONFIGURE: enable
+            CONTAINER_NAME: example-com-web
+            SERVER_ROLE: upstream
+            DOMAIN_NAME: "example.com"
+            PHP_CONTAINER_NAME: example-com-php
+        volumes:
+            - ./html/example.com:/var/www/html
+            - ./configurations/example-com:/configurations
+        networks:
+            example-com:
+
+    # Container: example-com-php. Upstream server's php using official PHP based image.
+    example-com-php:
+        extends:
+            file: common-services.yml
+            service: php-fpm
+        restart: on-failure
+        container_name: example-com-php
+        depends_on:
+            - server-db
+        expose:
+            - "9000"
+        logging:
+            driver: syslog
+            options:
+                syslog-address: "tcp://localhost:5514"
+                tag: "example-com-php"
+        environment:
+            AUTO_CONFIGURE: enable
+            CONTAINER_NAME: example-com-php
+            DOMAIN_NAME: "example.com"
+            SSMTP_MAILHUB: server-mta
+            # Change owner of /var/www/html and some special directories (/data/opcache, /sessions, /home/www-data) recursively to "www-data:www-data".
+            # As the default user is www-data and it is already used in PHP-FPM configuration files, this will solve PHP permission errors for development.
+            # This also affects the directories and files at host if you mount volumes. Will also be enabled if CHANGE_UID or CHANGE_GID is set.
+            CHANGE_OWNER: enable
+            # Change uid of default user www-data. You can make this match your current uid (id -u) on host to easily access mounted volumes for development.
+            CHANGE_UID: 1000
+            # Change gid of default group www-data. You can make this match your current gid (id -g) on host for development.
+            CHANGE_GID: 1000
+        volumes:
+            - ./html/example.com:/var/www/html
+            - ./configurations/example-com:/configurations
+        networks:
+            example-com:
+
+    # Container: server-proxy. Common reverse proxy.
+    server-proxy:
+        depends_on:
+            - example-com-web
+        environment:
+            VHOST_example.com: "example.com"
+            CONTAINER_NAME_example.com: example-com-web
+            CERT_CREATE_example.com: enable
+        networks:
+            # Note that example-com network must be listed also here to be accessible
+            example-com:
+            #test-tld:
+
+    # Container: server-log. Common rsyslog and and its own logrotate service.
+    server-log:
+        environment:
+            CTAG_example-com-web: "example-com-web"
+
+    # Container: server-db. Common MySql database.
+    server-db:
+        networks:
+            server-db:
+            # Note that example-com network must be listed also here to grant access to mysql
+            example-com:
+
+# Networks
+networks:
+    # Note that example-com network must be defined in networks section (bridge name must be 15 characters or less!!!)
+    example-com:
+        driver: bridge
+        #driver_opts:
+        #    com.docker.network.bridge.name: br-example

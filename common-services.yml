@@ -27,34 +27,29 @@
 # File Description : Common services versioning example
 ###
 
-# Versioning for some services. Stable branch major versions should be given.
-version: '2.1'
+# Versioning for common services. Stable branch major versions can be used.
+version: '2.4'
 
 services:
 
     nginx:
-        image: vkucukcakar/nginx
+        image: vkucukcakar/nginx:alpine
 
     php-fpm:
-        image: vkucukcakar/php-fpm
+        image: vkucukcakar/php-fpm:alpine
+        #image: vkucukcakar/php-fpm:alpine-extras
 
     rsyslog:
-        image: vkucukcakar/rsyslog
-
-    cron:
-        image: vkucukcakar/cron
-
-    #postfix:
-    #    image: vkucukcakar/postfix
+        image: vkucukcakar/rsyslog:alpine
 
     mysql:
-        image: mysql:5.7
+        image: mysql:5
 
     #phpmyadmin:
-    #    image: phpmyadmin/phpmyadmin:4.7
+    #    image: phpmyadmin/phpmyadmin:latest
 
     adminer:
-        image: adminer:4-standalone
+        image: adminer:standalone
 
     portainer:
-        image: portainer/portainer
+        image: portainer/portainer:latest
