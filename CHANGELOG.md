@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.1
+
+- Fixed add.sh
+- Removed some directory and files left from previous releases
+
 ## v2.0.0
 
 - Changed Compose configuration file (yml) structure

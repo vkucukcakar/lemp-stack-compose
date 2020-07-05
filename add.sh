@@ -48,6 +48,8 @@ if [ "$DOMAIN_NAME" ]; then
 			echo "You can include the configuration file as follows:"
 			echo "i.e.: docker-compose -f docker-compose.yml -f sites/$DOMAIN_NAME.yml up -d"
 		fi
+		mkdir "$DIR/html/$DOMAIN_NAME"
+		mkdir "$DIR/configurations/$CONTAINER_NAME"
 	else
 		echo "Error: $DOMAIN_NAME is not a valid domain name."
 		exit 1
