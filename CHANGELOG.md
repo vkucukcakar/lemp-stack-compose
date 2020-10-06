@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.0
+
+- Some tags changed in common-services.yml
+
 ## v2.0.1
 
 - Fixed add.sh

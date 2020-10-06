@@ -33,14 +33,14 @@ version: '2.4'
 services:
 
     nginx:
-        image: vkucukcakar/nginx:alpine
+        image: vkucukcakar/nginx
 
     php-fpm:
-        image: vkucukcakar/php-fpm:alpine
-        #image: vkucukcakar/php-fpm:alpine-extras
+        image: vkucukcakar/php-fpm
+        #image: vkucukcakar/php-fpm:latest-extras
 
     rsyslog:
-        image: vkucukcakar/rsyslog:alpine
+        image: vkucukcakar/rsyslog
 
     mysql:
         image: mysql:5
