@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.1
+
+- Added server-mta (commented) to the networks section of site template
+
 ## v2.1.0
 
 - Some tags changed in common-services.yml

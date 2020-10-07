@@ -93,6 +93,7 @@ services:
             - ./configurations/${CONTAINER_NAME}:/configurations
         networks:
             ${CONTAINER_NAME}:
+            #server-mta:
 
     # Container: server-proxy. Common reverse proxy.
     server-proxy:

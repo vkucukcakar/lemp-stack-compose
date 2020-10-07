@@ -93,6 +93,7 @@ services:
             - ./configurations/example-com:/configurations
         networks:
             example-com:
+            #server-mta:
 
     # Container: server-proxy. Common reverse proxy.
     server-proxy:
