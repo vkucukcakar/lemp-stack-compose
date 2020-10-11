@@ -5,7 +5,7 @@ LEMP Stack with Docker Compose
 Nginx, PHP-FPM, MySQL and more...
 LEMP stack to run a single or a few number of isolated web sites sharing a common MySQL database.
 A Nginx reverse proxy is used on the top and web sites have their own PHP and upstream Nginx containers.
-Docker Compose files contain a proxy and an upstream configuration directives for example.com. 
+Docker Compose files contain proxy and upstream configuration directives for example.com. 
 Images automatically create well-commented (Nginx, PHP, etc.) configuration files to be edited by mounting directories.
 These compose files are a ready-to-use example of LEMP stack with Docker. 
 
