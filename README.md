@@ -7,6 +7,7 @@ LEMP stack to run a single or a few number of isolated web sites sharing a commo
 A Nginx reverse proxy is used on the top and web sites have their own PHP and upstream Nginx containers.
 Docker Compose files contain proxy and upstream configuration directives for example.com. 
 Images automatically create well-commented (Nginx, PHP, etc.) configuration files to be edited by mounting directories.
+Currently configured to use a rsyslog image and text logs.
 These compose files are a ready-to-use example of LEMP stack with Docker. 
 
 * Custom Nginx and PHP-FPM images based on official images
