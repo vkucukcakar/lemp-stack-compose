@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.0
+
+- Fixed possible PHP container to web server http connection (remote fopen etc.) problems especially on development environments
+- Added SERVER_INTERNAL_HOSTNAME variable to site template
+- Switched Portainer to portainer/portainer-ce image
+
 ## v2.1.1
 
 - Added server-mta (commented) to the networks section of site template

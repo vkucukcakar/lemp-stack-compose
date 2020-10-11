@@ -46,10 +46,10 @@ services:
         image: mysql:5
 
     #phpmyadmin:
-    #    image: phpmyadmin/phpmyadmin:latest
+    #    image: phpmyadmin/phpmyadmin
 
     adminer:
         image: adminer:standalone
 
     portainer:
-        image: portainer/portainer:latest
+        image: portainer/portainer-ce
