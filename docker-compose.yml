@@ -148,7 +148,8 @@ services:
         depends_on:
             - server-db
         ports:
-            - "8080:8080"
+            # Accessible only from localhost. Changing to "8080:8080" will make Adminer accessible from the Internet
+            - "127.0.0.1:8080:8080"
         logging:
             driver: syslog
             options:
@@ -175,7 +176,8 @@ services:
             server-log:
                 condition: service_healthy
         ports:
-            - "9000:9000"
+            # Accessible only from localhost. Changing to "9000:9000" will make Portainer accessible from the Internet
+            - "127.0.0.1:9000:9000"
         command: -l hide-me=from-portainer
         labels:
             hide-me: "from-portainer"

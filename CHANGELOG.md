@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.3.0
+
+- Improved documentation
+- Made Adminer and Portainer accessible only from localhost
+- Added SERVER_INTERNAL_HOSTNAME to pre-created example.com.yml
+- Increased Adminer php.ini resource limits
+
 ## v2.2.0
 
 - Fixed possible PHP container to web server http connection (remote fopen etc.) problems especially on development environments
