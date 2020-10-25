@@ -91,7 +91,7 @@ You can use Certbot to install and automatically update Let's Encrypt certificat
 
 * Certbot will update the certificates automatically before the expire.
   A deploy hook script must be created, that will be executed by Certbot, to reload server on certificate updates.
-  
+
 	$ echo -e '#!/usr/bin/env bash\ndocker kill --signal=HUP server-proxy' > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
 	$ chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
 
