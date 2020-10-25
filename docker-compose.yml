@@ -58,6 +58,8 @@ services:
             DHPARAM_KEYSIZE: 2048
         volumes:
             - ./configurations/server-proxy:/configurations
+            # See README.md to learn how to activate Let's Encrypt support
+            #- /etc/letsencrypt/live:/etc/letsencrypt/live
 
     # Container: server-log. Common rsyslog and and its own logrotate service.
     server-log:

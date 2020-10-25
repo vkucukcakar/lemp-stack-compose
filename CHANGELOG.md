@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.4.0
+
+- Added Let's Encrypt support and instructions
+
 ## v2.3.0
 
 - Improved documentation

@@ -26,6 +26,13 @@ Build example.com in minutes.
 
 ## Usage
 
+### Installation
+
+To easily use and maintain, clone into /lemp folder if you have root permissions.
+Configuration files, document root, logs and everything will be inside /lemp folder.
+
+	$ sudo git clone https://github.com/vkucukcakar/lemp-stack-compose.git /lemp
+
 ### Initial startup
 	$ docker-compose -f docker-compose.yml -f sites/example.com.yml up -d
 
@@ -47,13 +54,60 @@ Compose file version is also upgraded but sticked with 2.4 because of "extends" 
 Server directory structure is not changed and Compose configuration directives are nearly the same.
 Previously created container configuration (nginx, php, etc.) files in /configurations are also compatible as they are related with images.
 
+## Let's Encrypt Support
+
+The Nginx image used in lemp-stack-compose will create self signed SSL certificates by default.
+However if you want free and automatic updating SSL certificates, you can use Let's Encrypt for a real website. 
+Let's Encrypt is a non-profit certificate authority. [Let's Encrypt](https://letsencrypt.org/ )
+You can use Certbot to install and automatically update Let's Encrypt certificates.
+
+* Install Certbot or a compatible ACME client. Installation is OS dependant. 
+  [Certbot](https://certbot.eff.org/instructions ) 
+  Only install Certbot, do not run any Certbot commands. Certbot will be used with webroot plugin, not nginx plugin.
+
+* Uncomment the relevant directive to mount "/etc/letsencrypt/live" in "volumes" section of "server-proxy" in "docker-compose.yml"
+
+* Use up parameter for the changes to take effect
+	$ docker-compose -f docker-compose.yml -f sites/example.com.yml up -d
+
+* Use certbot only with "certonly" (!) command and "webroot" plugin (!) for the initial setup. (Use your own webroot path and domain)
+	$ certbot certonly --webroot -w /lemp/html/example.com -d www.example.com -d example.com
+
+* Certificates will be created if everything was fine. Read the output and verify that files are created
+	
+* (Optional) Check if the certificates are accessible inside the "server-proxy" container
+	$ docker exec -it server-proxy bash
+	$ ls /etc/letsencrypt/live/example.com/fullchain.pem
+	$ ls /etc/letsencrypt/live/example.com/privkey.pem
+	$ exit
+
+* Enable the new certificates by editing the mounted file "/lemp/configurations/server-proxy/nginx-example.com.conf"
+  See the commented sections in the file.
+
+* To test if everything is fine, manually reload Nginx server in "server-proxy" container with zero downtime by sending a HUP signal
+	$ docker kill --signal=HUP server-proxy
+
+* See the logs at "/lemp/log/server-common.log" to see if everything was fine
+
+* Certbot will update the certificates automatically before the expire.
+  A deploy hook script must be created, that will be executed by Certbot, to reload server on certificate updates.
+  
+	$ echo -e '#!/usr/bin/env bash\ndocker kill --signal=HUP server-proxy' > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+	$ chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+
+  Now, reload-nginx.sh will be executed by Certbot if certificates are updated. (Manually execute it to test once)
+  This bash script will reload server (of course with zero downtime).
+  
+
 ## Caveats
 
 * You may encounter some problems with starting containers in correct order with "restart: always".
   That's why I have used "restart: on-failure" in the example.
   The start on reboot can be achieved with a cron job by using docker-compose alternatively:  
   @reboot root cd /lemp && docker-compose -f docker-compose.yml -f sites/example.com.yml start
-  
+
+* After first run, see the newly created well-commented Nginx configuration files for connection & request limits, DDOS protection, admin login protection, WAF and more.  
+
 * Currently, no mail server is included in the configuration, please add your favorite one to the commented section in docker-compose.yml.
 
 * WordPress users should use vkucukcakar/php-fpm:latest-extras image in common-services.yml as it contains recommended PHP extensions
