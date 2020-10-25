@@ -68,24 +68,26 @@ You can use Certbot to install and automatically update Let's Encrypt certificat
 * Uncomment the relevant directive to mount "/etc/letsencrypt/live" in "volumes" section of "server-proxy" in "docker-compose.yml"
 
 * Use up parameter for the changes to take effect
-	$ docker-compose -f docker-compose.yml -f sites/example.com.yml up -d
+	`$ docker-compose -f docker-compose.yml -f sites/example.com.yml up -d`
 
 * Use certbot only with "certonly" (!) command and "webroot" plugin (!) for the initial setup. (Use your own webroot path and domain)
-	$ certbot certonly --webroot -w /lemp/html/example.com -d www.example.com -d example.com
+	`$ certbot certonly --webroot -w /lemp/html/example.com -d www.example.com -d example.com`
 
 * Certificates will be created if everything was fine. Read the output and verify that files are created
 	
 * (Optional) Check if the certificates are accessible inside the "server-proxy" container
+```
 	$ docker exec -it server-proxy bash
 	$ ls /etc/letsencrypt/live/example.com/fullchain.pem
 	$ ls /etc/letsencrypt/live/example.com/privkey.pem
 	$ exit
+```
 
 * Enable the new certificates by editing the mounted file "/lemp/configurations/server-proxy/nginx-example.com.conf"
   See the commented sections in the file.
 
 * To test if everything is fine, manually reload Nginx server in "server-proxy" container with zero downtime by sending a HUP signal
-	$ docker kill --signal=HUP server-proxy
+	`$ docker kill --signal=HUP server-proxy`
 
 * See the logs at "/lemp/log/server-common.log" to see if everything was fine
 
