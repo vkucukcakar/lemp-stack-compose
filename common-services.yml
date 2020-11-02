@@ -44,6 +44,7 @@ services:
 
     mysql:
         image: mysql:5
+        #image: mariadb:10
 
     #phpmyadmin:
     #    image: phpmyadmin/phpmyadmin

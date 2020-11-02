@@ -107,7 +107,6 @@ services:
         networks:
             # Note that example-com network must be listed also here to be accessible
             example-com:
-            #test-tld:
 
     # Container: server-log. Common rsyslog and and its own logrotate service.
     server-log:
@@ -117,7 +116,6 @@ services:
     # Container: server-db. Common MySql database.
     server-db:
         networks:
-            server-db:
             # Note that example-com network must be listed also here to grant access to mysql
             example-com:
 

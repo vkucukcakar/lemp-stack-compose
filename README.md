@@ -54,6 +54,36 @@ Compose file version is also upgraded but sticked with 2.4 because of "extends" 
 Server directory structure is not changed and Compose configuration directives are nearly the same.
 Previously created container configuration (nginx, php, etc.) files in /configurations are also compatible as they are related with images.
 
+## MySQL migration
+
+MySQL is replaced with MariaDB, which the an open source drop-in replacement for MySQL used in many distros.
+Although MariaDB is a drop-in replacement for MySQL, it may not be 100% compatible on some situations.
+Currently, MariaDB is commented on common-services.yml.
+
+Before migration, you must backup all of the databeses. This is important!
+
+Then you can comment MySQL and uncomment the MariaDB line before starting the stack.
+
+Use Docker's up command.
+```	
+	$ docker-compose -f docker-compose.yml -f sites/example.com.yml -sites/new-domain-name.yml up -d
+```	
+You can see some mysql errors in /lemp/log/server-common.log (or in your logging agent)
+
+Mysql must be upgraded by running mysql_upgrade inside the server-db container.
+```
+	$ docker exec -it server-db bash
+	
+	$ mysql_upgrade --password
+```
+Check the error logs again. This is important too. I have seen some corrupted tables at this stage, in the past.
+
+If there are some errors you can try mysqlcheck.
+```
+	$ mysqlcheck -uroot --password --repair --all-databases
+```
+You can drop the tables and import from the backups if the problem is not solved.
+
 ## Let's Encrypt Support
 
 The Nginx image used in lemp-stack-compose will create self signed SSL certificates by default.

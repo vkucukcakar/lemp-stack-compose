@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.4.1
+
+- MySQL is replaced with MariaDB in common-services.yml
+- Currently, MariaDB is commented but original MySQL is deprecated
+- Removed some unnecessary lines from the site template
+
 ## v2.4.0
 
 - Added Let's Encrypt support and instructions
