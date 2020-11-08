@@ -58,11 +58,8 @@ Previously created container configuration (nginx, php, etc.) files in /configur
 
 MySQL is replaced with MariaDB, which the an open source drop-in replacement for MySQL used in many distros.
 Although MariaDB is a drop-in replacement for MySQL, it may not be 100% compatible on some situations.
-Currently, MariaDB is commented on common-services.yml.
 
 Before migration, you must backup all of the databeses. This is important!
-
-Then you can comment MySQL and uncomment the MariaDB line before starting the stack.
 
 Use Docker's up command.
 ```	

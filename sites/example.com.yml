@@ -80,7 +80,6 @@ services:
             CONTAINER_NAME: example-com-php
             DOMAIN_NAME: "example.com"
             SSMTP_MAILHUB: server-mta
-            SERVER_INTERNAL_HOSTNAME: server-proxy
             # Change owner of /var/www/html and some special directories (/data/opcache, /sessions, /home/www-data) recursively to "www-data:www-data".
             # As the default user is www-data and it is already used in PHP-FPM configuration files, this will solve PHP permission errors for development.
             # This also affects the directories and files at host if you mount volumes. Will also be enabled if CHANGE_UID or CHANGE_GID is set.
@@ -107,6 +106,8 @@ services:
         networks:
             # Note that example-com network must be listed also here to be accessible
             example-com:
+                aliases:
+                    - example.com
 
     # Container: server-log. Common rsyslog and and its own logrotate service.
     server-log:

@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.5.0
+
+- MySQL is replaced with MariaDB
+- Removed SERVER_INTERNAL_HOSTNAME from template and example
+- Added network aliases to site template to fix PHP container to web server http connection
+
 ## v2.4.1
 
 - MySQL is replaced with MariaDB in common-services.yml
